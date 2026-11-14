@@ -9,6 +9,8 @@ module.exports = (req, res) => {
     message: clip(q.message, 'message'),
     color: q.color,
     labelColor: q.labelColor,
+    theme: q.theme,
+    pattern: q.pattern,
   };
   const svg = q.style === 'single' ? single(opts) : wide(opts);
   res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');

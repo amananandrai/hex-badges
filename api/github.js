@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
   } else {
     try {
       const out = await metric.get(q.repo, q);
-      opts = { label, message: out.message, color: q.color || out.color || 'blue', labelColor: q.labelColor };
+      opts = { label, message: out.message, color: q.color || out.color || 'blue', labelColor: q.labelColor, theme: q.theme, pattern: q.pattern };
       if (q.metric === 'last-commit') maxAge = 300;
     } catch (e) {
       const msg = e instanceof BadgeError ? e.message : 'error';
