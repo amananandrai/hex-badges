@@ -5,8 +5,8 @@
       "destination": "/api/badge?style=:style&label=:label&message=:message&color=:color"
     },
     {
-      "source": "/github/stars/:owner/:repo_name",
-      "destination": "/api/github-stars?repo=:owner/:repo_name"
+      "source": "/github/:metric/:owner/:repo_name",
+      "destination": "/api/github?metric=:metric&repo=:owner/:repo_name"
     }
   ]
 }

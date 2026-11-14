@@ -10,9 +10,23 @@ Params: style, label, message, color, labelColor (wide only). Colors: names or h
 
 Deploy: `npm i -g vercel && vercel`
 
-## GitHub stars (single hexagon)
+## GitHub badges
 
-    /api/github-stars?repo=facebook/react
-    /github/stars/facebook/react          (path form)
+    /github/<metric>/<owner>/<repo>
+    /github/stars/facebook/react
+    /github/last-commit/facebook/react?style=wide
 
-Optional `color` param. Set `GITHUB_TOKEN` in Vercel env vars to avoid the 60 req/hour unauthenticated limit.
+| Metric | Shows |
+|---|---|
+| stars, forks, watchers | counts |
+| issues, prs | open issues / open pull requests |
+| release | latest release (falls back to latest tag) |
+| tag | latest tag |
+| last-commit | relative time, optional `branch` |
+| license | SPDX id |
+| contributors | count (includes anonymous) |
+| language | primary language |
+| size | repository size |
+
+Params: `style` (`single` default, or `wide`), `label`, `color`, `labelColor` (wide only).
+Set `GITHUB_TOKEN` in Vercel env vars to avoid the 60 req/hour unauthenticated limit.

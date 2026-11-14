@@ -1,1 +1,8 @@
-{ "name": "hex-badges", "version": "1.0.0", "private": true }
+{
+  "name": "hex-badges",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
