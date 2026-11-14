@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hex-badges: Avengers-themed hexagon badges</title>
+<style>
+  :root { color-scheme: dark; --bg:#0d1117; --card:#161b22; --line:#30363d; --text:#e6edf3; --muted:#8b949e; --accent:#f6c445; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:28px; margin:0 0 4px; }
+  h2 { font-size:20px; margin:40px 0 12px; }
+  p.lead { color:var(--muted); margin:0 0 8px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+  .theme { text-align:center; cursor:pointer; transition:border-color .15s; }
+  .theme:hover, .theme.sel { border-color:var(--accent); }
+  .theme .name { font-weight:600; }
+  .theme .note { color:var(--muted); font-size:13px; margin-bottom:8px; }
+  .theme .row { display:flex; align-items:center; justify-content:center; gap:16px; min-height:100px; flex-wrap:wrap; }
+  form { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+  label { display:flex; flex-direction:column; font-size:13px; color:var(--muted); gap:4px; }
+  input, select { background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font:inherit; }
+  input:focus, select:focus { outline:2px solid var(--accent); outline-offset:-1px; }
+  .preview { display:flex; align-items:center; justify-content:center; min-height:150px; margin:16px 0; background:var(--bg); border:1px dashed var(--line); border-radius:12px; padding:16px; }
+  .out { display:flex; flex-direction:column; gap:8px; }
+  .out div { display:flex; gap:8px; }
+  .out code { flex:1; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font:12.5px ui-monospace,Menlo,Consolas,monospace; overflow-x:auto; white-space:nowrap; }
+  button { background:var(--accent); color:#1b1400; border:0; border-radius:8px; padding:8px 14px; font-weight:600; cursor:pointer; }
+  button:active { transform:translateY(1px); }
+  .hide { display:none; }
+  a { color:var(--accent); }
+  footer { margin-top:48px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>hex-badges</h1>
+  <p class="lead">Hexagon badges for your README, with 10 Avengers-inspired themes. Pick a theme, build a link, paste it in.</p>
+
+  <h2>Badge builder</h2>
+  <div class="card">
+    <form id="f" onsubmit="return false">
+      <label>Source
+        <select id="source"><option value="github">GitHub repo</option><option value="custom">Custom text</option></select>
+      </label>
+      <label data-for="github">Metric
+        <select id="metric">
+          <option>stars</option><option>forks</option><option>watchers</option><option>issues</option><option>prs</option>
+          <option>release</option><option>tag</option><option>last-commit</option><option>license</option>
+          <option>contributors</option><option>language</option><option>size</option>
+        </select>
+      </label>
+      <label data-for="github">Repository (owner/repo)
+        <input id="repo" value="facebook/react" autocomplete="off" spellcheck="false">
+      </label>
+      <label data-for="custom" class="hide">Label
+        <input id="label" value="build" maxlength="40">
+      </label>
+      <label data-for="custom" class="hide">Message
+        <input id="message" value="passing" maxlength="40">
+      </label>
+      <label>Theme
+        <select id="theme"></select>
+      </label>
+      <label>Style
+        <select id="style"><option value="single">Single hexagon</option><option value="wide">Elongated</option></select>
+      </label>
+      <label id="patternWrap">Pattern (single only)
+        <select id="pattern"><option value="">On</option><option value="none">Off</option></select>
+      </label>
+    </form>
+    <div class="preview"><img id="img" alt="badge preview"></div>
+    <div class="out">
+      <div><code id="md"></code><button data-copy="md">Copy</button></div>
+      <div><code id="html"></code><button data-copy="html">Copy</button></div>
+      <div><code id="url"></code><button data-copy="url">Copy</button></div>
+    </div>
+  </div>
+
+  <h2>Themes</h2>
+  <p class="lead">Click a theme to use it in the builder.</p>
+  <div class="grid" id="gallery"></div>
+
+  <footer>
+    Notes: the glow looks best on dark backgrounds. Add <code>?pattern=none</code> to turn off single-hexagon patterns.
+  </footer>
+</main>
+<script>
+(function () {
+  var THEMES = [
+    ['stark-forge','Stark Forge','red + gold, arc rings','stars','12.4k'],
+    ['latveria','Latveria','green + silver, plates','forks','980'],
+    ['asgard','Asgard','red + silver, lightning','license','MIT'],
+    ['wakanda','Wakanda','black + purple, lattice','release','v2.1.0'],
+    ['star-shield','Star Shield','blue + red + white, stars and stripes','issues','42'],
+    ['gamma','Gamma Smash','green + purple, cracks','size','2.0 MB'],
+    ['red-room','Red Room','black + red, reticle','commit','3 days ago'],
+    ['web-slinger','Web Slinger','red + blue + black, web','PRs','7'],
+    ['mystic-arts','Mystic Arts','amber + crimson, mandala','language','Python'],
+    ['infinity','Infinity','purple + gold, cosmos','contributors','1.2k']
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var origin = location.origin;
+  var enc = encodeURIComponent;
+
+  var themeSel = $('theme');
+  THEMES.forEach(function (t) { var o = document.createElement('option'); o.value = t[0]; o.textContent = t[1]; themeSel.appendChild(o); });
+
+  var gal = $('gallery');
+  THEMES.forEach(function (t) {
+    var c = document.createElement('div');
+    c.className = 'card theme';
+    c.dataset.theme = t[0];
+    var q = '&label=' + enc(t[3]) + '&message=' + enc(t[4]) + '&theme=' + t[0];
+    c.innerHTML = '<div class="name"></div><div class="note"></div><div class="row">' +
+      '<img alt="" loading="lazy" src="/api/badge?style=single' + q + '">' +
+      '<img alt="" loading="lazy" src="/api/badge?style=wide' + q + '"></div>';
+    c.querySelector('.name').textContent = t[1];
+    c.querySelector('.note').textContent = t[2];
+    c.addEventListener('click', function () { themeSel.value = t[0]; update(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    gal.appendChild(c);
+  });
+
+  function path() {
+    var theme = themeSel.value, style = $('style').value, pattern = $('pattern').value;
+    var params = [];
+    if ($('source').value === 'github') {
+      var repo = $('repo').value.trim();
+      var base = '/github/' + enc($('metric').value) + '/' + repo.split('/').map(enc).join('/');
+      params.push('theme=' + theme, 'style=' + style);
+      if (style === 'single' && pattern) params.push('pattern=' + pattern);
+      return base + '?' + params.join('&');
+    }
+    params.push('style=' + style, 'label=' + enc($('label').value), 'message=' + enc($('message').value), 'theme=' + theme);
+    if (style === 'single' && pattern) params.push('pattern=' + pattern);
+    return '/api/badge?' + params.join('&');
+  }
+
+  function update() {
+    var custom = $('source').value === 'custom';
+    document.querySelectorAll('[data-for]').forEach(function (el) { el.classList.toggle('hide', (el.dataset.for === 'custom') !== custom); });
+    $('patternWrap').classList.toggle('hide', $('style').value !== 'single');
+    var p = path(), url = origin + p;
+    $('img').src = p;
+    $('url').textContent = url;
+    $('md').textContent = '![' + (custom ? $('label').value : $('metric').value) + '](' + url + ')';
+    $('html').textContent = '<img src="' + url + '" alt="badge">';
+    document.querySelectorAll('.theme').forEach(function (el) { el.classList.toggle('sel', el.dataset.theme === themeSel.value); });
+  }
+
+  document.querySelectorAll('#f select, #f input').forEach(function (el) { el.addEventListener('input', update); });
+  document.querySelectorAll('button[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var text = $(b.dataset.copy).textContent;
+      var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1200); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done);
+      else { var r = document.createRange(); r.selectNodeContents($(b.dataset.copy)); var s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); done(); }
+    });
+  });
+  update();
+})();
+</script>
+</body>
+</html>

@@ -52,3 +52,7 @@ Add `?theme=<name>` to any badge. Single hexagons get a glow and a themed patter
     /github/stars/facebook/react?theme=web-slinger&style=wide
 
 The glow looks best on dark backgrounds. Preview sheet: `node scripts/patterns-sheet.js out.svg`.
+
+## Landing page
+
+`public/index.html` is served at `/`: a badge builder with copy buttons and a gallery of all themes.
