@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/badge/:style/:label/:message/:color",
+      "destination": "/api/badge?style=:style&label=:label&message=:message&color=:color"
+    },
+    {
+      "source": "/github/stars/:owner/:repo_name",
+      "destination": "/api/github-stars?repo=:owner/:repo_name"
+    }
+  ]
+}
